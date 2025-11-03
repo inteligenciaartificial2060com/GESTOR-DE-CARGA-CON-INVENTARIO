@@ -459,6 +459,35 @@ input[type="number"] { width: 100px; }
     <button id="assistance-button" class="secondary" title="Solicitar Asistencia">?</button>
 
     <script>
+        
+        // ==============================================================================
+        //  🔒 NIVEL 1: PROTECCIÓN PROVISIONAL CON CONTRASEÑA (IMPLEMENTACIÓN)
+        //  ESTO DEBE SER REEMPLAZADO POR FIREBASE PARA UNA SEGURIDAD REAL
+        // ==============================================================================
+        
+        // ⚠️ CAMBIA ESTA CLAVE por la que tú quieras
+        const CLAVE_PROVISIONAL_SECRETA = "MiClaveTemporal12345"; 
+
+        function verificarAccesoProvisional() {
+            let clave = prompt("🔐 Introduzca la clave de acceso para usar el Gestor de Carga (Provisional):");
+            
+            if (clave !== CLAVE_PROVISIONAL_SECRETA) {
+                // Bloquear completamente la aplicación y el script
+                document.body.innerHTML = '<h1 style="color: red; text-align: center; margin-top: 100px;">❌ Acceso Denegado. Clave Incorrecta.</h1>';
+                
+                // Detiene toda la ejecución restante del script
+                throw new Error("Acceso no autorizado."); 
+            }
+            // Si la clave es correcta, el script continúa ejecutándose
+        }
+
+        // LLAMADA A LA FUNCIÓN DE VERIFICACIÓN
+        verificarAccesoProvisional(); 
+
+        // ==============================================================================
+        //  🚀 INICIO DEL SCRIPT PRINCIPAL V18
+        // ==============================================================================
+
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONSTANTES DE ALMACENAMIENTO ---
             const PRODUCT_DB_KEY = 'productDB_v16';
@@ -598,7 +627,8 @@ input[type="number"] { width: 100px; }
                 document.getElementById(tabName).style.display = "block";
                 elmnt.className += " active";
                 if(tabName === 'tab-view-products') {
-                    setTimeout(renderProductList, 0);
+                    // Mueve la tarea potencialmente pesada (renderizado) a la cola de eventos
+                    setTimeout(renderProductList, 0); 
                 }
             }
 
@@ -618,6 +648,8 @@ input[type="number"] { width: 100px; }
                 productDB[code] = { desc, volume };
                 saveProducts(); clearProductForm();
 
+                // 🌟 MITIGACIÓN DE RENDIMIENTO: Usamos setTimeout(..., 0) para liberar el hilo principal.
+                // La alerta se mostrará de inmediato, y el renderizado (tarea pesada) se hará después.
                 setTimeout(() => {
                     if (document.getElementById('tab-view-products').classList.contains('active')) {
                         searchProductInput.value = code;
@@ -1281,7 +1313,7 @@ input[type="number"] { width: 100px; }
                 report += `Tiempo Total: ${totalTimeMin} minutos\n\n`;
 
                 if (loadIncidents.length > 0) {
-                    report += `--- INCIDENCIAS (${loadIncidents.length}) --N`;
+                    report += `--- INCIDENCIAS (${loadIncidents.length}) ---\n`;
                     loadIncidents.forEach(inc => { report += `- ${inc}\n`; });
                     allJourneyIncidents.push(...loadIncidents);
                 } else {
